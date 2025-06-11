@@ -11,7 +11,7 @@ The task is involve development of the a system for measuring the liquid level i
 ---
 
 ## 🛠 **Build && Install Guide**  
-**Docker** ([Install Guide](https://docs.docker.com/engine/install/))
+**Docker** ([Install Guide](https://docs.docker.com/engine/install/)) <br>
 In terminal:  
 1) `docker-compose build` 
 2) `docker-compose up` 
@@ -37,7 +37,7 @@ In terminal:
 | Team Member							   | Telegram Alias	| Email Address   					   | Track												          |
 |-----------------------------------|-----------------|-----------------------------------|---------------------------------------------------|
 | Dmitriy Vizitei (Lead)				| @otkisaev			| d.vizitei@innopolis.university 	| Low level (embedded) + Testing engineer  			 |
-| Senea Belykh							   | @SenyaZenya		| [Email address] 					| Low level (embedded) + Electric circuit engineer	    |
-| Dmitry Ryabov							| @theDioxider		| d.ryabov@innopolis.university 	| Low level (imbedded) + Electric circuit engineer 	 |
-| Anas Hamrouni							| @reachnasta		| [Email address] 					| Design engineer 									          |
+| Senea Belykh							   | @SenyaZenya		| s.belykh@innopolis.university		| Low level (embedded) + Electric circuit engineer  |
+| Dmitry Ryabov							| @theDioxider		| d.ryabov@innopolis.university 	   | Low level (imbedded) + Electric circuit engineer  |
+| Anas Hamrouni							| @reachnasta		| a.hamrouni@innopolis.university	| Design engineer 									       |
 | Andrew Pavlov							| @chaleshka_0		| and.pavlov@innopolis.university	| Tech writer 										          |  
