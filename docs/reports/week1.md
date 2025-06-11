@@ -77,7 +77,7 @@ Testing prototypes on the raw version of the tank.
 | Senea Belykh				| Experiments with sonar sensor and potential measure across different liquids: [1 photo](https://drive.google.com/file/d/1iks-ICr-Jj6YDTbC_7g15NeuBZ0NiNc6/view), [2 photo](https://drive.google.com/file/d/1U9N12xxdES-TP-YdTxnyD7aCKuFkxgFy/view) |
 | Dmitry Ryabov				| Developing the sketch model for float - measuring solution and mechanical approach to it: [1 photo](https://drive.google.com/file/d/1B1FFSR7dEByimEyTBBDzXpCQsAIk3exs/view), [2 photo](https://drive.google.com/file/d/1paRiFeqJcF4dm9tiB3F9iAVMbtcniBE8/view) |
 | Anas Hamrouni				| Assembly and 3d printing of prepared slice of given fuel tank: [1 photo](https://drive.google.com/file/d/1lN4BLDHryvy0sIiT8JNs3DoKl2EEyYCS/view), [2 photo](https://drive.google.com/file/d/1RkKiIEnV-A94Wn-GcgxEGb1zZ3Kr0lAV/view), [3 photo](https://drive.google.com/file/d/1N7Sre0JA2KTpTBYblD5QK42kd-GkthfW/view), [4 photo](https://drive.google.com/file/d/1aHhj54TxobaaM10KJL29bydH0yrErl8g/view), [5 photo](https://drive.google.com/file/d/1IxX14vZsZe_04kBdniVQ5BPaV8_wYsOM/view)|
-| Andrew Pavlov				| [Designed the repository: made simple dockerfile && docker-compose, filled README](https://github.com/IU-Capstone-Project-2025/ProjectFly/commit/1e72d54a43d55706654bb48358b227a1712d22fd) |
+| Andrew Pavlov				| Designed the repository: [made simple dockerfile && docker-compose, filled README](https://github.com/IU-Capstone-Project-2025/ProjectFly/commit/1e72d54a43d55706654bb48358b227a1712d22fd) |
 
 ## Confirmation of the code's operability
 
