@@ -77,6 +77,7 @@ Testing prototypes
  ##### *Links*:
  - [video](https://drive.google.com/file/d/1Viy6Q0saY_VFVdwo4Y1-elQ6-YxZEiJ0/view?usp=drive_link)
  - [schema](https://drive.google.com/file/d/1ElpVAXV8CM7XJ8-GV-PHEquDS3nxepYG/view?usp=drive_link)
+ - [commit](https://github.com/IU-Capstone-Project-2025/ProjectFly/commit/0b85bc00f4705b56a24b432282a6310fd2ffb4f2)
 <br/>
 <br/>
 
@@ -92,7 +93,7 @@ Clarification from the customer: *He prefers that we do not go into the mathemat
 
 | Member					| Contribution					|
 |---------------------------|-------------------------------|
-| Dmitriy Vizitei			| [Planning the work](https://drive.google.com/file/d/1gMR6xSsX36B3hY9kbOCmtgMwcS75k4nC/view?usp=drive_link), testing one of the prototypes: [video](https://drive.google.com/file/d/1Viy6Q0saY_VFVdwo4Y1-elQ6-YxZEiJ0/view?usp=drive_link), [schema](https://drive.google.com/file/d/1ElpVAXV8CM7XJ8-GV-PHEquDS3nxepYG/view?usp=drive_link).	|
+| Dmitriy Vizitei			| [Planning the work](https://drive.google.com/file/d/1gMR6xSsX36B3hY9kbOCmtgMwcS75k4nC/view?usp=drive_link), testing one of the prototypes: [video](https://drive.google.com/file/d/1Viy6Q0saY_VFVdwo4Y1-elQ6-YxZEiJ0/view?usp=drive_link), [schema](https://drive.google.com/file/d/1ElpVAXV8CM7XJ8-GV-PHEquDS3nxepYG/view?usp=drive_link), [commit](https://github.com/IU-Capstone-Project-2025/ProjectFly/commit/0b85bc00f4705b56a24b432282a6310fd2ffb4f2).	|
 | Senea Belykh				| Build the prototype based on [reed switch](https://en.wikipedia.org/wiki/Reed_switch): [schema](https://drive.google.com/file/d/1HSIqzhiNN1nDQKsxPV_4JEf09wa4fA4u/view?usp=drive_link), [builded scheme](https://drive.google.com/file/d/1XPFuSay2cHmU6ANBiu6EqrAynp7D94Xp/view?usp=drive_link).	|
 | Dmitry Ryabov				| Managed to read measurements from the new prototype of sensor based on stm and reed configuration: [video](https://drive.google.com/file/d/1tDcIl50uG16ULDPnCgHA8W5yxoyPV0qn/view?usp=drive_link), [commit 1](https://github.com/IU-Capstone-Project-2025/ProjectFly/commit/f93522ddb09a518377ced257cc0ca16c6add2b1f), [commit 2](https://github.com/IU-Capstone-Project-2025/ProjectFly/commit/e084e92ea104956475aa945d4a9cade105bdb73c). [Geometric implementation of first prototype](https://drive.google.com/file/d/1gd1Zq0q2f0FHHBFnNQjB2sdK0_8jG9m8/view?usp=drive_link). 	|
 | Anas Hamrouni				| Sensor installation design: [Screenshot 1](https://drive.google.com/file/d/1L9kOTLYdC7mNY9wW7mFL8em9XUuGiUwT/view?usp=drive_link), [Screenshot 2](https://drive.google.com/file/d/1gHUbHs0_TNIRGTnDAtzoiVuIBHDGAfwj/view?usp=drive_link), [file 1](https://drive.google.com/file/d/1nWXCW6NQID7t2FsywJsJTqwMTLUtGRwR/view?usp=drive_link), [file 2](https://drive.google.com/file/d/1oYTtV5gna4aSWWOiLER292Gw-_cxK6or/view?usp=drive_link).	|
