@@ -23,7 +23,7 @@ title: "Week #2"
 
 ### Prioritized backlog
 
-![Backlog](https://drive.google.com/file/d/1SVCITMS0NNPQQf46QtkI3mAZfNA7ZgF2/view?usp=drive_link)
+![Backlog](week2_backlogs.jpg)
 
 ## Project specific progress
 
