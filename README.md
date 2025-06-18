@@ -34,10 +34,10 @@ In terminal:
 
 ### **Team Members**
 
-| Team Member							   | Telegram Alias	| Email Address   					   | Track												          |
-|-----------------------------------|-----------------|-----------------------------------|---------------------------------------------------|
-| Dmitriy Vizitei (Lead)				| @otkisaev			| d.vizitei@innopolis.university 	| Low level (embedded) + Testing engineer  			 |
-| Senea Belykh							   | @SenyaZenya		| s.belykh@innopolis.university		| Low level (embedded) + Electric circuit engineer  |
-| Dmitry Ryabov							| @theDioxider		| d.ryabov@innopolis.university 	   | Low level (imbedded) + Electric circuit engineer  |
-| Anas Hamrouni							| @reachnasta		| a.hamrouni@innopolis.university	| Design engineer 									       |
-| Andrew Pavlov							| @chaleshka_0		| and.pavlov@innopolis.university	| Tech writer 										          |  
+| Team Member							   | Telegram Alias	| Email Address   					   |
+|-----------------------------------|-----------------|-----------------------------------|
+| Dmitriy Vizitei (Lead)				| @otkisaev			| d.vizitei@innopolis.university 	|
+| Senea Belykh							   | @SenyaZenya		| s.belykh@innopolis.university	|
+| Dmitry Ryabov							| @theDioxider		| d.ryabov@innopolis.university |
+| Anas Hamrouni							| @reachnasta		| a.hamrouni@innopolis.university |
+| Andrew Pavlov							| @chaleshka_0		| and.pavlov@innopolis.university |  
