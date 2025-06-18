@@ -58,34 +58,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := bom-bom
+BUILD_ARTIFACT_NAME := project_fly
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-bom-bom.elf \
+project_fly.elf \
 
 MAP_FILES += \
-bom-bom.map \
+project_fly.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-bom-bom.list \
+project_fly.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: bom-bom.elf secondary-outputs
+main-build: project_fly.elf secondary-outputs
 
 # Tool invocations
-bom-bom.elf bom-bom.map: $(OBJS) $(USER_OBJS) C:\Users\Dioxider\STM32CubeIDE\workspace_1.18.1\bom-bom\STM32F767ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "bom-bom.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\Dioxider\STM32CubeIDE\workspace_1.18.1\bom-bom\STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="bom-bom.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+project_fly.elf project_fly.map: $(OBJS) $(USER_OBJS) C:\Users\Dioxider\Documents\project-fly\embedded\STM32F767ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "project_fly.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\Dioxider\Documents\project-fly\embedded\STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="project_fly.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -94,14 +94,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-bom-bom.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "bom-bom.list"
+project_fly.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "project_fly.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) bom-bom.elf bom-bom.list bom-bom.map default.size.stdout
+	-$(RM) default.size.stdout project_fly.elf project_fly.list project_fly.map
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
