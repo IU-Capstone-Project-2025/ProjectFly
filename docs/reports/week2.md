@@ -25,6 +25,8 @@ title: "Week #2"
 
 ![Backlog](week2_backlogs.jpg)
 
+More about that check [here (Individual contribution of each participant)](#individual-contribution-of-each-participant)
+
 ## Project specific progress
 
 
