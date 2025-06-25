@@ -32,6 +32,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define ADC_MAX_VALUE 4095
 #define ADC_BUFFER_SIZE 64
 
 /* USER CODE END PD */
@@ -51,8 +52,8 @@ TIM_HandleTypeDef htim4;
 USART_HandleTypeDef husart3;
 
 /* USER CODE BEGIN PV */
-uint32_t adcData;
-uint32_t adcBuffer[ADC_BUFFER_SIZE];
+uint32_t adcData[2];
+uint32_t adcBuffer[2][ADC_BUFFER_SIZE];
 
 /* USER CODE END PV */
 
@@ -67,6 +68,7 @@ static void MX_USART3_Init(void);
 /* USER CODE BEGIN PFP */
 void comprint(char *, int);
 void setPWM(uint16_t, TIM_HandleTypeDef *, uint16_t);
+void printMeasurements();
 
 /* USER CODE END PFP */
 
@@ -110,11 +112,8 @@ int main(void)
   MX_ADC1_Init();
   MX_USART3_Init();
   /* USER CODE BEGIN 2 */
-  /// PWM Configuration
-  setPWM(2000, &htim3, TIM_CHANNEL_3);
-
-  /// ADC Configuration
-  HAL_ADC_Start_DMA(&hadc1, &adcData, 1);
+  setPWM(2000, &htim4, TIM_CHANNEL_2);
+  HAL_ADC_Start_DMA(&hadc1, adcData, 2);
 
   /* USER CODE END 2 */
 
@@ -125,11 +124,11 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	setPWM(500, &htim4, TIM_CHANNEL_2);
+	setPWM(1000, &htim3, TIM_CHANNEL_3);
 	HAL_Delay(100);
-	setPWM(5000, &htim4, TIM_CHANNEL_2);
-	HAL_ADC_Start_DMA(&hadc1, &adcData, 1);
-    comprint(buf, sprintf(buf, "adc: %lu\r\n", adcData));
+	setPWM(10000, &htim3, TIM_CHANNEL_3);
+	HAL_ADC_Start_DMA(&hadc1, adcData, 2);
+    printMeasurements();
 	HAL_Delay(100);
   }
   /* USER CODE END 3 */
@@ -199,13 +198,13 @@ static void MX_ADC1_Init(void)
   hadc1.Instance = ADC1;
   hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
-  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
+  hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.NbrOfConversion = 2;
   hadc1.Init.DMAContinuousRequests = ENABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
@@ -215,9 +214,18 @@ static void MX_ADC1_Init(void)
 
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
-  sConfig.Channel = ADC_CHANNEL_0;
+  sConfig.Channel = ADC_CHANNEL_3;
   sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+  sConfig.SamplingTime = ADC_SAMPLETIME_144CYCLES;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+  */
+  sConfig.Channel = ADC_CHANNEL_10;
+  sConfig.Rank = ADC_REGULAR_RANK_2;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -476,9 +484,36 @@ void setPWM(uint16_t value, TIM_HandleTypeDef *timer, uint16_t channel)
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 	if (hadc->Instance == ADC1) {
 		static uint16_t i = 0;
-		adcBuffer[i++] = adcData;
+		for (int j = 0; j < 2; ++j) {
+			adcBuffer[j][i++] = adcData[j];
+		}
 	}
 }
+
+void printMeasurements() {
+	static const int BAR_LENGTH = 40;
+	static const char FILL_SIGN[] = "##################################################################";
+	static const char EMPTY_SIGN[] = "------------------------------------------------------------------";
+	char buff[512];
+	// TODO continuous ADC conversion for averaging
+	/*
+	long long adcSum[2] = { 0 };
+	float avgAdc[2];
+	for (int k = 0; k < 2; ++k) {
+		for (int i = 0; i < ADC_BUFFER_SIZE; ++i) {
+			adcSum[k] += adcBuffer[k][i];
+		}
+		avgAdc[k] = adcSum[k] / (float) ADC_BUFFER_SIZE;
+	}
+	*/
+	comprint(buff, sprintf(buff, "\033[1J"));
+	for (int i = 0; i < 2; ++i) {
+		comprint(buff, sprintf(buff, "Line %d: %ld/%d\r\n", i + 1, adcData[i], ADC_MAX_VALUE));
+		int line_fill = (int) (adcData[i] / (float) ADC_MAX_VALUE * BAR_LENGTH);
+		comprint(buff, sprintf(buff, "[%.*s%.*s]\r\n", line_fill, FILL_SIGN, (BAR_LENGTH - line_fill), EMPTY_SIGN));
+	}
+}
+
 
 /* USER CODE END 4 */
 
