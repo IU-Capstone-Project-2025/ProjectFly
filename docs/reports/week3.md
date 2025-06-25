@@ -24,7 +24,7 @@ title: "Week #3"
 
 ## Demonstration of the working MVP
 
-https://github.com/IU-Capstone-Project-2025/ProjectFly/blob/main/docs/reports/week3_demo.mp4
+https://github.com/user-attachments/assets/4fa052ff-b1a2-4596-b420-3efbf912d3e5
 
 ## Internal demo
 
