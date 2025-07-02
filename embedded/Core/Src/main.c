@@ -130,7 +130,10 @@ int main(void)
   MX_ADC1_Init();
   MX_USART3_Init();
   /* USER CODE BEGIN 2 */
-  setPWM(2000, &htim4, TIM_CHANNEL_2);
+  setPWM(1000, &htim4, TIM_CHANNEL_2);
+
+  char buf[512];
+  comprint(buf, sprintf(buf, "\033[1J"));
 
   /* USER CODE END 2 */
 
@@ -560,15 +563,15 @@ void printMeasurements() {
 	long long adcSum[2] = { 0 };
 	int adcAvg[2];
 	for (int k = 0; k < 2; ++k) {
-		for (int i = 0; i < ADC_BUFFER_SIZE; ++i) {
+		for (int i = 0; i < ADC_WINDOW_SIZE; ++i) {
 			adcSum[k] += adcBuffer[k][i];
 		}
-		adcAvg[k] = (int) (adcSum[k] / (float) ADC_BUFFER_SIZE);
+		adcAvg[k] = (int) (adcSum[k] / (float) ADC_WINDOW_SIZE);
 	}
-	comprint(buff, sprintf(buff, "\033[1J"));
+	comprint(buff, sprintf(buff, "\033[H"));
 	for (int i = 0; i < 2; ++i) {
 		int value = adcAvg[i];
-		comprint(buff, sprintf(buff, "Line %d: %d/%d\r\n", i + 1, value, ADC_MAX_VALUE));
+		comprint(buff, sprintf(buff, "Line %d: \033[1m%d\033[m/%d\r\n", i + 1, value, ADC_MAX_VALUE));
 		int line_fill = (int) (value / (float) ADC_MAX_VALUE * BAR_LENGTH);
 		comprint(buff, sprintf(buff, "[%.*s%.*s]\r\n", line_fill, FILL_SIGN, (BAR_LENGTH - line_fill), EMPTY_SIGN));
 	}
