@@ -34,7 +34,8 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define ADC_MAX_VALUE 4095
-#define ADC_BUFFER_SIZE 64
+#define ADC_WINDOW_SIZE 1024
+#define SENSOR_LINES 2
 
 /* USER CODE END PD */
 
@@ -68,7 +69,7 @@ const osThreadAttr_t AdcTask_attributes = {
 };
 /* USER CODE BEGIN PV */
 uint32_t adcData[2];
-uint32_t adcBuffer[2][ADC_BUFFER_SIZE];
+uint32_t adcBuffer[2][ADC_WINDOW_SIZE];
 
 /* USER CODE END PV */
 
@@ -546,12 +547,12 @@ void setPWM(uint16_t value, TIM_HandleTypeDef *timer, uint16_t channel)
 }
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
-	static uint16_t i = 0;
+	static uint16_t adc1_window_i = 0;
 	if (hadc->Instance == ADC1) {
-		for (int j = 0; j < 2; ++j) {
-			adcBuffer[j][i] = adcData[j];
+		for (int j = 0; j < SENSOR_LINES; ++j) {
+			adcBuffer[j][adc1_window_i] = adcData[j];
 		}
-		i = ++i % ADC_BUFFER_SIZE;
+		adc1_window_i = ++adc1_window_i % ADC_WINDOW_SIZE;
 	}
 }
 
@@ -560,16 +561,16 @@ void printMeasurements() {
 	static const char FILL_SIGN[] = "##################################################################";
 	static const char EMPTY_SIGN[] = "------------------------------------------------------------------";
 	char buff[512];
-	long long adcSum[2] = { 0 };
-	int adcAvg[2];
-	for (int k = 0; k < 2; ++k) {
+	long long adcSum[SENSOR_LINES] = { 0 };
+	int adcAvg[SENSOR_LINES];
+	for (int k = 0; k < SENSOR_LINES; ++k) {
 		for (int i = 0; i < ADC_WINDOW_SIZE; ++i) {
 			adcSum[k] += adcBuffer[k][i];
 		}
 		adcAvg[k] = (int) (adcSum[k] / (float) ADC_WINDOW_SIZE);
 	}
 	comprint(buff, sprintf(buff, "\033[H"));
-	for (int i = 0; i < 2; ++i) {
+	for (int i = 0; i < SENSOR_LINES; ++i) {
 		int value = adcAvg[i];
 		comprint(buff, sprintf(buff, "Line %d: \033[1m%d\033[m/%d\r\n", i + 1, value, ADC_MAX_VALUE));
 		int line_fill = (int) (value / (float) ADC_MAX_VALUE * BAR_LENGTH);
@@ -608,8 +609,8 @@ void AdcRead(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	HAL_ADC_Start_DMA(&hadc1, adcData, 2);
-	osDelay(10);
+	HAL_ADC_Start_DMA(&hadc1, adcData, SENSOR_LINES);
+	osDelay(1);
   }
   /* USER CODE END AdcRead */
 }
