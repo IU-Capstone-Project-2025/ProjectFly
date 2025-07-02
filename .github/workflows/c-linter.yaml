@@ -1,0 +1,37 @@
+name: c-linter
+
+on:
+  push:
+    paths:
+      - "embedded/*.c"
+  pull_request:
+    paths:
+      - "embedded/*.c"
+  workflow_dispatch:
+
+
+jobs:
+  c-linter:
+    name: Analyze C source code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run C-Linter
+        uses: cpp-linter/cpp-linter-action@v2
+        id: linter
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          style: file
+          files-changed-only: false
+          thread-comments: false
+
+      - name: Fail fast?!
+        if: steps.linter.outputs.checks-failed != 0
+        run: |
+          echo "some linter checks failed. ${{ steps.linter.outputs.checks-failed }}"
+        # for actual deployment
+        # run: exit 1
