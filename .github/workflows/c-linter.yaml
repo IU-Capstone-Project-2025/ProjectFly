@@ -3,11 +3,13 @@ name: c-linter
 on:
   push:
     paths:
-      - "embedded/*.c"
+      - "embedded/Core/main.c"
   pull_request:
     paths:
-      - "embedded/*.c"
+      - "embedded/Core/main.c"
   workflow_dispatch:
+    paths:
+      - "embedded/Core/main.c"
 
 
 jobs:
