@@ -3,13 +3,13 @@ name: c-linter
 on:
   push:
     paths:
-      - "embedded/Core/main.c"
+      - "embedded/Core/Src/main\.c$"
   pull_request:
     paths:
-      - "embedded/Core/main.c"
+      - "embedded/Core/Src/main\.c$"
   workflow_dispatch:
     paths:
-      - "embedded/Core/main.c"
+      - "embedded/Core/Src/main\.c$"
 
 
 jobs:
@@ -36,4 +36,4 @@ jobs:
         run: |
           echo "some linter checks failed. ${{ steps.linter.outputs.checks-failed }}"
         # for actual deployment
-        # run: exit 1
+        run: exit 1
