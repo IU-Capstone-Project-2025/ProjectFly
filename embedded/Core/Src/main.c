@@ -33,8 +33,11 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+// max value ADC can output
 #define ADC_MAX_VALUE 4095
+// number of measurements to store for averaging
 #define ADC_WINDOW_SIZE 1024
+// number of sensor lines
 #define SENSOR_LINES 2
 
 /* USER CODE END PD */
@@ -131,9 +134,11 @@ int main(void)
   MX_ADC1_Init();
   MX_USART3_Init();
   /* USER CODE BEGIN 2 */
+  // blue LED brightness
   setPWM(1000, &htim4, TIM_CHANNEL_2);
 
   char buf[512];
+  // clear COM port terminal
   comprint(buf, sprintf(buf, "\033[1J"));
 
   /* USER CODE END 2 */
@@ -519,21 +524,37 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+/**
+ * The main loop of the program.
+ */
 void defaultTask() {
 	for (;;) {
+		// blink with green LED, dimming it
 		setPWM(1000, &htim3, TIM_CHANNEL_3);
 		osDelay(250);
 		setPWM(10000, &htim3, TIM_CHANNEL_3);
 		printMeasurements();
 		osDelay(250);
 	}
-
 }
 
+/**
+ * Print message to the default (ST-Link) serial port.
+ *
+ * @param[in] msg Message to be printed
+ * @param[in] len Length of the message
+ */
 void comprint(char *msg, int len) {
 	HAL_USART_Transmit(&husart3, (uint8_t *)msg, len, 100);
 }
 
+/**
+ * Set pulse time of a timer's channel.
+ *
+ * @param[in] value Pulse ticks
+ * @param[in] timer Timer
+ * @param[in] channel Channel
+ */
 void setPWM(uint16_t value, TIM_HandleTypeDef *timer, uint16_t channel)
 {
     TIM_OC_InitTypeDef sConfigOC;
@@ -546,7 +567,13 @@ void setPWM(uint16_t value, TIM_HandleTypeDef *timer, uint16_t channel)
     HAL_TIM_PWM_Start(timer, channel);
 }
 
+/**
+ * Callback on ADC conversion.
+ *
+ * @param[in] ADC which invoked the conversion
+ */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
+	// index to value in window to overwrite old values with new ones
 	static uint16_t adc1_window_i = 0;
 	if (hadc->Instance == ADC1) {
 		for (int j = 0; j < SENSOR_LINES; ++j) {
@@ -556,6 +583,9 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 	}
 }
 
+/**
+ * Pretty-print a current measurement state of water level.
+ */
 void printMeasurements() {
 	static const int BAR_LENGTH = 40;
 	static const char FILL_SIGN[] = "##################################################################";
