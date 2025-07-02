@@ -33,8 +33,12 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+// max value ADC can output
 #define ADC_MAX_VALUE 4095
-#define ADC_BUFFER_SIZE 64
+// number of measurements to store for averaging
+#define ADC_WINDOW_SIZE 1024
+// number of sensor lines
+#define SENSOR_LINES 2
 
 /* USER CODE END PD */
 
@@ -68,7 +72,7 @@ const osThreadAttr_t AdcTask_attributes = {
 };
 /* USER CODE BEGIN PV */
 uint32_t adcData[2];
-uint32_t adcBuffer[2][ADC_BUFFER_SIZE];
+uint32_t adcBuffer[2][ADC_WINDOW_SIZE];
 
 /* USER CODE END PV */
 
@@ -130,7 +134,12 @@ int main(void)
   MX_ADC1_Init();
   MX_USART3_Init();
   /* USER CODE BEGIN 2 */
-  setPWM(2000, &htim4, TIM_CHANNEL_2);
+  // blue LED brightness
+  setPWM(1000, &htim4, TIM_CHANNEL_2);
+
+  char buf[512];
+  // clear COM port terminal
+  comprint(buf, sprintf(buf, "\033[1J"));
 
   /* USER CODE END 2 */
 
@@ -515,21 +524,37 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+/**
+ * The main loop of the program.
+ */
 void defaultTask() {
 	for (;;) {
+		// blink with green LED, dimming it
 		setPWM(1000, &htim3, TIM_CHANNEL_3);
 		osDelay(250);
 		setPWM(10000, &htim3, TIM_CHANNEL_3);
 		printMeasurements();
 		osDelay(250);
 	}
-
 }
 
+/**
+ * Print message to the default (ST-Link) serial port.
+ *
+ * @param[in] msg Message to be printed
+ * @param[in] len Length of the message
+ */
 void comprint(char *msg, int len) {
 	HAL_USART_Transmit(&husart3, (uint8_t *)msg, len, 100);
 }
 
+/**
+ * Set pulse time of a timer's channel.
+ *
+ * @param[in] value Pulse ticks
+ * @param[in] timer Timer
+ * @param[in] channel Channel
+ */
 void setPWM(uint16_t value, TIM_HandleTypeDef *timer, uint16_t channel)
 {
     TIM_OC_InitTypeDef sConfigOC;
@@ -542,33 +567,42 @@ void setPWM(uint16_t value, TIM_HandleTypeDef *timer, uint16_t channel)
     HAL_TIM_PWM_Start(timer, channel);
 }
 
+/**
+ * Callback on ADC conversion.
+ *
+ * @param[in] ADC which invoked the conversion
+ */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
-	static uint16_t i = 0;
+	// index to value in window to overwrite old values with new ones
+	static uint16_t adc1_window_i = 0;
 	if (hadc->Instance == ADC1) {
-		for (int j = 0; j < 2; ++j) {
-			adcBuffer[j][i] = adcData[j];
+		for (int j = 0; j < SENSOR_LINES; ++j) {
+			adcBuffer[j][adc1_window_i] = adcData[j];
 		}
-		i = ++i % ADC_BUFFER_SIZE;
+		adc1_window_i = ++adc1_window_i % ADC_WINDOW_SIZE;
 	}
 }
 
+/**
+ * Pretty-print a current measurement state of water level.
+ */
 void printMeasurements() {
 	static const int BAR_LENGTH = 40;
 	static const char FILL_SIGN[] = "##################################################################";
 	static const char EMPTY_SIGN[] = "------------------------------------------------------------------";
 	char buff[512];
-	long long adcSum[2] = { 0 };
-	int adcAvg[2];
-	for (int k = 0; k < 2; ++k) {
-		for (int i = 0; i < ADC_BUFFER_SIZE; ++i) {
+	long long adcSum[SENSOR_LINES] = { 0 };
+	int adcAvg[SENSOR_LINES];
+	for (int k = 0; k < SENSOR_LINES; ++k) {
+		for (int i = 0; i < ADC_WINDOW_SIZE; ++i) {
 			adcSum[k] += adcBuffer[k][i];
 		}
-		adcAvg[k] = (int) (adcSum[k] / (float) ADC_BUFFER_SIZE);
+		adcAvg[k] = (int) (adcSum[k] / (float) ADC_WINDOW_SIZE);
 	}
-	comprint(buff, sprintf(buff, "\033[1J"));
-	for (int i = 0; i < 2; ++i) {
+	comprint(buff, sprintf(buff, "\033[H"));
+	for (int i = 0; i < SENSOR_LINES; ++i) {
 		int value = adcAvg[i];
-		comprint(buff, sprintf(buff, "Line %d: %d/%d\r\n", i + 1, value, ADC_MAX_VALUE));
+		comprint(buff, sprintf(buff, "Line %d: \033[1m%d\033[m/%d\r\n", i + 1, value, ADC_MAX_VALUE));
 		int line_fill = (int) (value / (float) ADC_MAX_VALUE * BAR_LENGTH);
 		comprint(buff, sprintf(buff, "[%.*s%.*s]\r\n", line_fill, FILL_SIGN, (BAR_LENGTH - line_fill), EMPTY_SIGN));
 	}
@@ -605,8 +639,8 @@ void AdcRead(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	HAL_ADC_Start_DMA(&hadc1, adcData, 2);
-	osDelay(10);
+	HAL_ADC_Start_DMA(&hadc1, adcData, SENSOR_LINES);
+	osDelay(1);
   }
   /* USER CODE END AdcRead */
 }
