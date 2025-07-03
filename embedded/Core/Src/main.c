@@ -71,8 +71,9 @@ const osThreadAttr_t AdcTask_attributes = {
   .priority = (osPriority_t) osPriorityBelowNormal,
 };
 /* USER CODE BEGIN PV */
-uint32_t adcData[2];
-uint32_t adcBuffer[2][ADC_WINDOW_SIZE];
+uint32_t adcData[SENSOR_LINES];
+uint32_t adcBuffer[SENSOR_LINES][ADC_WINDOW_SIZE] = {0};
+uint64_t adcSum[SENSOR_LINES] = {0};
 
 /* USER CODE END PV */
 
@@ -576,8 +577,10 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 	// index to value in window to overwrite old values with new ones
 	static uint16_t adc1_window_i = 0;
 	if (hadc->Instance == ADC1) {
-		for (int j = 0; j < SENSOR_LINES; ++j) {
-			adcBuffer[j][adc1_window_i] = adcData[j];
+		for (int i = 0; i < SENSOR_LINES; ++i) {
+			adcSum[i] -= adcBuffer[i][adc1_window_i];
+			adcSum[i] += adcData[i];
+			adcBuffer[i][adc1_window_i] = adcData[i];
 		}
 		adc1_window_i = ++adc1_window_i % ADC_WINDOW_SIZE;
 	}
@@ -591,17 +594,9 @@ void printMeasurements() {
 	static const char FILL_SIGN[] = "##################################################################";
 	static const char EMPTY_SIGN[] = "------------------------------------------------------------------";
 	char buff[512];
-	long long adcSum[SENSOR_LINES] = { 0 };
-	int adcAvg[SENSOR_LINES];
-	for (int k = 0; k < SENSOR_LINES; ++k) {
-		for (int i = 0; i < ADC_WINDOW_SIZE; ++i) {
-			adcSum[k] += adcBuffer[k][i];
-		}
-		adcAvg[k] = (int) (adcSum[k] / (float) ADC_WINDOW_SIZE);
-	}
 	comprint(buff, sprintf(buff, "\033[H"));
 	for (int i = 0; i < SENSOR_LINES; ++i) {
-		int value = adcAvg[i];
+		int value = adcSum[i] / ADC_WINDOW_SIZE;
 		comprint(buff, sprintf(buff, "Line %d: \033[1m%4.d\033[m/%d\r\n", i + 1, value, ADC_MAX_VALUE));
 		int line_fill = (int) (value / (float) ADC_MAX_VALUE * BAR_LENGTH);
 		comprint(buff, sprintf(buff, "[%.*s%.*s]\r\n", line_fill, FILL_SIGN, (BAR_LENGTH - line_fill), EMPTY_SIGN));
