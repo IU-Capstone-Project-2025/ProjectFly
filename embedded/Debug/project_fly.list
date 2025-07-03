@@ -742,10 +742,10 @@ int main(void)
  80008ae:	bf00      	nop
  80008b0:	200002e8 	.word	0x200002e8
  80008b4:	0800b164 	.word	0x0800b164
- 80008b8:	0800b1b0 	.word	0x0800b1b0
+ 80008b8:	0800b1b4 	.word	0x0800b1b4
  80008bc:	080010d5 	.word	0x080010d5
  80008c0:	20000384 	.word	0x20000384
- 80008c4:	0800b1d4 	.word	0x0800b1d4
+ 80008c4:	0800b1d8 	.word	0x0800b1d8
  80008c8:	080010e9 	.word	0x080010e9
  80008cc:	20000388 	.word	0x20000388
 
@@ -1636,6 +1636,7 @@ void defaultTask() {
  8000dec:	b580      	push	{r7, lr}
  8000dee:	af00      	add	r7, sp, #0
 	for (;;) {
+		// blink with green LED, dimming it
 		setPWM(1000, &htim3, TIM_CHANNEL_3);
  8000df0:	2208      	movs	r2, #8
  8000df2:	490a      	ldr	r1, [pc, #40]	@ (8000e1c <defaultTask+0x30>)
@@ -1750,7 +1751,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
  8000e90:	4a15      	ldr	r2, [pc, #84]	@ (8000ee8 <HAL_ADC_ConvCpltCallback+0x64>)
  8000e92:	4293      	cmp	r3, r2
  8000e94:	d122      	bne.n	8000edc <HAL_ADC_ConvCpltCallback+0x58>
-		for (int j = 0; j < 2; ++j) {
+		for (int j = 0; j < SENSOR_LINES; ++j) {
  8000e96:	2300      	movs	r3, #0
  8000e98:	60fb      	str	r3, [r7, #12]
  8000e9a:	e00f      	b.n	8000ebc <HAL_ADC_ConvCpltCallback+0x38>
@@ -1766,7 +1767,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
  8000eae:	029b      	lsls	r3, r3, #10
  8000eb0:	4403      	add	r3, r0
  8000eb2:	f841 2023 	str.w	r2, [r1, r3, lsl #2]
-		for (int j = 0; j < 2; ++j) {
+		for (int j = 0; j < SENSOR_LINES; ++j) {
  8000eb6:	68fb      	ldr	r3, [r7, #12]
  8000eb8:	3301      	adds	r3, #1
  8000eba:	60fb      	str	r3, [r7, #12]
@@ -1812,7 +1813,7 @@ void printMeasurements() {
 	static const char FILL_SIGN[] = "##################################################################";
 	static const char EMPTY_SIGN[] = "------------------------------------------------------------------";
 	char buff[512];
-	long long adcSum[2] = { 0 };
+	long long adcSum[SENSOR_LINES] = { 0 };
  8000f02:	f507 730c 	add.w	r3, r7, #560	@ 0x230
  8000f06:	f5a3 730a 	sub.w	r3, r3, #552	@ 0x228
  8000f0a:	461a      	mov	r2, r3
@@ -1821,8 +1822,8 @@ void printMeasurements() {
  8000f10:	6053      	str	r3, [r2, #4]
  8000f12:	6093      	str	r3, [r2, #8]
  8000f14:	60d3      	str	r3, [r2, #12]
-	int adcAvg[2];
-	for (int k = 0; k < 2; ++k) {
+	int adcAvg[SENSOR_LINES];
+	for (int k = 0; k < SENSOR_LINES; ++k) {
  8000f16:	2300      	movs	r3, #0
  8000f18:	f8c7 322c 	str.w	r3, [r7, #556]	@ 0x22c
  8000f1c:	e056      	b.n	8000fcc <printMeasurements+0xd4>
@@ -1881,7 +1882,7 @@ void printMeasurements() {
  8000fb6:	f5a3 730c 	sub.w	r3, r3, #560	@ 0x230
  8000fba:	f8d7 222c 	ldr.w	r2, [r7, #556]	@ 0x22c
  8000fbe:	f843 1022 	str.w	r1, [r3, r2, lsl #2]
-	for (int k = 0; k < 2; ++k) {
+	for (int k = 0; k < SENSOR_LINES; ++k) {
  8000fc2:	f8d7 322c 	ldr.w	r3, [r7, #556]	@ 0x22c
  8000fc6:	3301      	adds	r3, #1
  8000fc8:	f8c7 322c 	str.w	r3, [r7, #556]	@ 0x22c
@@ -1899,7 +1900,7 @@ void printMeasurements() {
  8000fe6:	4611      	mov	r1, r2
  8000fe8:	4618      	mov	r0, r3
  8000fea:	f7ff ff19 	bl	8000e20 <comprint>
-	for (int i = 0; i < 2; ++i) {
+	for (int i = 0; i < SENSOR_LINES; ++i) {
  8000fee:	2300      	movs	r3, #0
  8000ff0:	f8c7 3224 	str.w	r3, [r7, #548]	@ 0x224
  8000ff4:	e051      	b.n	800109a <printMeasurements+0x1a2>
@@ -1909,7 +1910,7 @@ void printMeasurements() {
  8000ffe:	f8d7 2224 	ldr.w	r2, [r7, #548]	@ 0x224
  8001002:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
  8001006:	f8c7 3220 	str.w	r3, [r7, #544]	@ 0x220
-		comprint(buff, sprintf(buff, "Line %d: \033[1m%d\033[m/%d\r\n", i + 1, value, ADC_MAX_VALUE));
+		comprint(buff, sprintf(buff, "Line %d: \033[1m%4.d\033[m/%d\r\n", i + 1, value, ADC_MAX_VALUE));
  800100a:	f8d7 3224 	ldr.w	r3, [r7, #548]	@ 0x224
  800100e:	1c5a      	adds	r2, r3, #1
  8001010:	f107 001c 	add.w	r0, r7, #28
@@ -1955,7 +1956,7 @@ void printMeasurements() {
  8001088:	4611      	mov	r1, r2
  800108a:	4618      	mov	r0, r3
  800108c:	f7ff fec8 	bl	8000e20 <comprint>
-	for (int i = 0; i < 2; ++i) {
+	for (int i = 0; i < SENSOR_LINES; ++i) {
  8001090:	f8d7 3224 	ldr.w	r3, [r7, #548]	@ 0x224
  8001094:	3301      	adds	r3, #1
  8001096:	f8c7 3224 	str.w	r3, [r7, #548]	@ 0x224
@@ -1974,10 +1975,10 @@ void printMeasurements() {
  80010b8:	0800b16c 	.word	0x0800b16c
  80010bc:	0800b170 	.word	0x0800b170
  80010c0:	457ff000 	.word	0x457ff000
- 80010c4:	0800b1f8 	.word	0x0800b1f8
- 80010c8:	0800b240 	.word	0x0800b240
- 80010cc:	0800b1fc 	.word	0x0800b1fc
- 80010d0:	0800b188 	.word	0x0800b188
+ 80010c4:	0800b1fc 	.word	0x0800b1fc
+ 80010c8:	0800b244 	.word	0x0800b244
+ 80010cc:	0800b200 	.word	0x0800b200
+ 80010d0:	0800b18c 	.word	0x0800b18c
 
 080010d4 <StartDefaultTask>:
   * @param  argument: Not used
@@ -2017,7 +2018,7 @@ void AdcRead(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	HAL_ADC_Start_DMA(&hadc1, adcData, 2);
+	HAL_ADC_Start_DMA(&hadc1, adcData, SENSOR_LINES);
  80010f0:	2202      	movs	r2, #2
  80010f2:	4904      	ldr	r1, [pc, #16]	@ (8001104 <AdcRead+0x1c>)
  80010f4:	4804      	ldr	r0, [pc, #16]	@ (8001108 <AdcRead+0x20>)
@@ -2025,7 +2026,7 @@ void AdcRead(void *argument)
 	osDelay(1);
  80010fa:	2001      	movs	r0, #1
  80010fc:	f004 fce8 	bl	8005ad0 <osDelay>
-	HAL_ADC_Start_DMA(&hadc1, adcData, 2);
+	HAL_ADC_Start_DMA(&hadc1, adcData, SENSOR_LINES);
  8001100:	bf00      	nop
  8001102:	e7f5      	b.n	80010f0 <AdcRead+0x8>
  8001104:	2000038c 	.word	0x2000038c
@@ -6476,7 +6477,7 @@ static uint32_t DMA_CalcBaseAndBitshift(DMA_HandleTypeDef *hdma)
  8002898:	4770      	bx	lr
  800289a:	bf00      	nop
  800289c:	aaaaaaab 	.word	0xaaaaaaab
- 80028a0:	0800b29c 	.word	0x0800b29c
+ 80028a0:	0800b2a0 	.word	0x0800b2a0
  80028a4:	fffffc00 	.word	0xfffffc00
 
 080028a8 <DMA_CheckFifoParam>:
@@ -8492,7 +8493,7 @@ HAL_StatusTypeDef HAL_RCC_ClockConfig(const RCC_ClkInitTypeDef  *RCC_ClkInitStru
  800344a:	bf00      	nop
  800344c:	40023c00 	.word	0x40023c00
  8003450:	40023800 	.word	0x40023800
- 8003454:	0800b284 	.word	0x0800b284
+ 8003454:	0800b288 	.word	0x0800b288
  8003458:	20000000 	.word	0x20000000
  800345c:	20000004 	.word	0x20000004
 
@@ -8793,7 +8794,7 @@ uint32_t HAL_RCC_GetPCLK1Freq(void)
  800369c:	4618      	mov	r0, r3
  800369e:	bd80      	pop	{r7, pc}
  80036a0:	40023800 	.word	0x40023800
- 80036a4:	0800b294 	.word	0x0800b294
+ 80036a4:	0800b298 	.word	0x0800b298
 
 080036a8 <HAL_RCC_GetPCLK2Freq>:
   * @note   Each time PCLK2 changes, this function must be called to update the
@@ -8819,7 +8820,7 @@ uint32_t HAL_RCC_GetPCLK2Freq(void)
  80036c4:	4618      	mov	r0, r3
  80036c6:	bd80      	pop	{r7, pc}
  80036c8:	40023800 	.word	0x40023800
- 80036cc:	0800b294 	.word	0x0800b294
+ 80036cc:	0800b298 	.word	0x0800b298
 
 080036d0 <HAL_RCC_GetClockConfig>:
   * will be configured.
@@ -19926,7 +19927,7 @@ BaseType_t xReturn;
  800743a:	3718      	adds	r7, #24
  800743c:	46bd      	mov	sp, r7
  800743e:	bd80      	pop	{r7, pc}
- 8007440:	0800b198 	.word	0x0800b198
+ 8007440:	0800b19c 	.word	0x0800b19c
  8007444:	08007ab1 	.word	0x08007ab1
  8007448:	20006c98 	.word	0x20006c98
  800744c:	200067a0 	.word	0x200067a0
@@ -21859,7 +21860,7 @@ BaseType_t xReturn = pdFAIL;
  8007ebc:	bd80      	pop	{r7, pc}
  8007ebe:	bf00      	nop
  8007ec0:	20006cd0 	.word	0x20006cd0
- 8007ec4:	0800b1a0 	.word	0x0800b1a0
+ 8007ec4:	0800b1a4 	.word	0x0800b1a4
  8007ec8:	08008011 	.word	0x08008011
  8007ecc:	20006cd4 	.word	0x20006cd4
 
@@ -22980,7 +22981,7 @@ static void prvCheckForValidListAndQueue( void )
  80084f8:	20006ccc 	.word	0x20006ccc
  80084fc:	20006d7c 	.word	0x20006d7c
  8008500:	20006cdc 	.word	0x20006cdc
- 8008504:	0800b1a8 	.word	0x0800b1a8
+ 8008504:	0800b1ac 	.word	0x0800b1ac
 
 08008508 <__cvt>:
  8008508:	b5f0      	push	{r4, r5, r6, r7, lr}
@@ -23376,11 +23377,11 @@ static void prvCheckForValidListAndQueue( void )
  80088c6:	bf00      	nop
  80088c8:	ffffffff 	.word	0xffffffff
  80088cc:	7fefffff 	.word	0x7fefffff
- 80088d0:	0800b2a8 	.word	0x0800b2a8
- 80088d4:	0800b2a4 	.word	0x0800b2a4
- 80088d8:	0800b2b0 	.word	0x0800b2b0
- 80088dc:	0800b2ac 	.word	0x0800b2ac
- 80088e0:	0800b2b4 	.word	0x0800b2b4
+ 80088d0:	0800b2ac 	.word	0x0800b2ac
+ 80088d4:	0800b2a8 	.word	0x0800b2a8
+ 80088d8:	0800b2b4 	.word	0x0800b2b4
+ 80088dc:	0800b2b0 	.word	0x0800b2b0
+ 80088e0:	0800b2b8 	.word	0x0800b2b8
  80088e4:	6da3      	ldr	r3, [r4, #88]	@ 0x58
  80088e6:	f8dd a028 	ldr.w	sl, [sp, #40]	@ 0x28
  80088ea:	4553      	cmp	r3, sl
@@ -23863,8 +23864,8 @@ static void prvCheckForValidListAndQueue( void )
  8008d64:	2500      	movs	r5, #0
  8008d66:	f104 0619 	add.w	r6, r4, #25
  8008d6a:	e7f5      	b.n	8008d58 <_printf_i+0x220>
- 8008d6c:	0800b2b6 	.word	0x0800b2b6
- 8008d70:	0800b2c7 	.word	0x0800b2c7
+ 8008d6c:	0800b2ba 	.word	0x0800b2ba
+ 8008d70:	0800b2cb 	.word	0x0800b2cb
 
 08008d74 <std>:
  8008d74:	2300      	movs	r3, #0
@@ -24707,14 +24708,14 @@ static void prvCheckForValidListAndQueue( void )
  8009554:	3fc68a28 	.word	0x3fc68a28
  8009558:	509f79fb 	.word	0x509f79fb
  800955c:	3fd34413 	.word	0x3fd34413
- 8009560:	0800b2e5 	.word	0x0800b2e5
- 8009564:	0800b2fc 	.word	0x0800b2fc
+ 8009560:	0800b2e9 	.word	0x0800b2e9
+ 8009564:	0800b300 	.word	0x0800b300
  8009568:	7ff00000 	.word	0x7ff00000
- 800956c:	0800b2e1 	.word	0x0800b2e1
- 8009570:	0800b2b5 	.word	0x0800b2b5
- 8009574:	0800b2b4 	.word	0x0800b2b4
+ 800956c:	0800b2e5 	.word	0x0800b2e5
+ 8009570:	0800b2b9 	.word	0x0800b2b9
+ 8009574:	0800b2b8 	.word	0x0800b2b8
  8009578:	0800b450 	.word	0x0800b450
- 800957c:	0800b354 	.word	0x0800b354
+ 800957c:	0800b358 	.word	0x0800b358
  8009580:	f8d9 201c 	ldr.w	r2, [r9, #28]
  8009584:	f1ba 0f0e 	cmp.w	sl, #14
  8009588:	6010      	str	r0, [r2, #0]
@@ -25475,8 +25476,8 @@ static void prvCheckForValidListAndQueue( void )
  8009d5c:	f000 f968 	bl	800a030 <__multadd>
  8009d60:	9001      	str	r0, [sp, #4]
  8009d62:	e7ec      	b.n	8009d3e <_dtoa_r+0xa8e>
- 8009d64:	0800b354 	.word	0x0800b354
- 8009d68:	0800b2d8 	.word	0x0800b2d8
+ 8009d64:	0800b358 	.word	0x0800b358
+ 8009d68:	0800b2dc 	.word	0x0800b2dc
 
 08009d6c <_free_r>:
  8009d6c:	b538      	push	{r3, r4, r5, lr}
@@ -25760,8 +25761,8 @@ static void prvCheckForValidListAndQueue( void )
  8009fdc:	e9c0 3303 	strd	r3, r3, [r0, #12]
  8009fe0:	e7f7      	b.n	8009fd2 <_Balloc+0x66>
  8009fe2:	bf00      	nop
- 8009fe4:	0800b2e5 	.word	0x0800b2e5
- 8009fe8:	0800b365 	.word	0x0800b365
+ 8009fe4:	0800b2e9 	.word	0x0800b2e9
+ 8009fe8:	0800b369 	.word	0x0800b369
 
 08009fec <_Bfree>:
  8009fec:	b570      	push	{r4, r5, r6, lr}
@@ -25789,8 +25790,8 @@ static void prvCheckForValidListAndQueue( void )
  800a020:	6021      	str	r1, [r4, #0]
  800a022:	f843 4022 	str.w	r4, [r3, r2, lsl #2]
  800a026:	bd70      	pop	{r4, r5, r6, pc}
- 800a028:	0800b2e5 	.word	0x0800b2e5
- 800a02c:	0800b365 	.word	0x0800b365
+ 800a028:	0800b2e9 	.word	0x0800b2e9
+ 800a02c:	0800b369 	.word	0x0800b369
 
 0800a030 <__multadd>:
  800a030:	e92d 41f0 	stmdb	sp!, {r4, r5, r6, r7, r8, lr}
@@ -25844,8 +25845,8 @@ static void prvCheckForValidListAndQueue( void )
  800a0ac:	6125      	str	r5, [r4, #16]
  800a0ae:	4620      	mov	r0, r4
  800a0b0:	e8bd 81f0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, pc}
- 800a0b4:	0800b354 	.word	0x0800b354
- 800a0b8:	0800b365 	.word	0x0800b365
+ 800a0b4:	0800b358 	.word	0x0800b358
+ 800a0b8:	0800b369 	.word	0x0800b369
 
 0800a0bc <__hi0bits>:
  800a0bc:	f5b0 3f80 	cmp.w	r0, #65536	@ 0x10000
@@ -25935,8 +25936,8 @@ static void prvCheckForValidListAndQueue( void )
  800a172:	6103      	str	r3, [r0, #16]
  800a174:	bd10      	pop	{r4, pc}
  800a176:	bf00      	nop
- 800a178:	0800b354 	.word	0x0800b354
- 800a17c:	0800b365 	.word	0x0800b365
+ 800a178:	0800b358 	.word	0x0800b358
+ 800a17c:	0800b369 	.word	0x0800b369
 
 0800a180 <__multiply>:
  800a180:	e92d 4ff0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
@@ -26055,8 +26056,8 @@ static void prvCheckForValidListAndQueue( void )
  800a2b6:	e79f      	b.n	800a1f8 <__multiply+0x78>
  800a2b8:	3e01      	subs	r6, #1
  800a2ba:	e7a1      	b.n	800a200 <__multiply+0x80>
- 800a2bc:	0800b354 	.word	0x0800b354
- 800a2c0:	0800b365 	.word	0x0800b365
+ 800a2bc:	0800b358 	.word	0x0800b358
+ 800a2c0:	0800b369 	.word	0x0800b369
 
 0800a2c4 <__pow5mult>:
  800a2c4:	e92d 43f8 	stmdb	sp!, {r3, r4, r5, r6, r7, r8, r9, lr}
@@ -26124,9 +26125,9 @@ static void prvCheckForValidListAndQueue( void )
  800a364:	4630      	mov	r0, r6
  800a366:	e8bd 83f8 	ldmia.w	sp!, {r3, r4, r5, r6, r7, r8, r9, pc}
  800a36a:	bf00      	nop
- 800a36c:	0800b418 	.word	0x0800b418
- 800a370:	0800b2e5 	.word	0x0800b2e5
- 800a374:	0800b365 	.word	0x0800b365
+ 800a36c:	0800b41c 	.word	0x0800b41c
+ 800a370:	0800b2e9 	.word	0x0800b2e9
+ 800a374:	0800b369 	.word	0x0800b369
 
 0800a378 <__lshift>:
  800a378:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
@@ -26205,8 +26206,8 @@ static void prvCheckForValidListAndQueue( void )
  800a442:	d8f9      	bhi.n	800a438 <__lshift+0xc0>
  800a444:	e7ea      	b.n	800a41c <__lshift+0xa4>
  800a446:	bf00      	nop
- 800a448:	0800b354 	.word	0x0800b354
- 800a44c:	0800b365 	.word	0x0800b365
+ 800a448:	0800b358 	.word	0x0800b358
+ 800a44c:	0800b369 	.word	0x0800b369
 
 0800a450 <__mcmp>:
  800a450:	690a      	ldr	r2, [r1, #16]
@@ -26342,8 +26343,8 @@ static void prvCheckForValidListAndQueue( void )
  800a5a2:	3f01      	subs	r7, #1
  800a5a4:	e7e7      	b.n	800a576 <__mdiff+0xee>
  800a5a6:	bf00      	nop
- 800a5a8:	0800b354 	.word	0x0800b354
- 800a5ac:	0800b365 	.word	0x0800b365
+ 800a5a8:	0800b358 	.word	0x0800b358
+ 800a5ac:	0800b369 	.word	0x0800b369
 
 0800a5b0 <__d2b>:
  800a5b0:	e92d 43f7 	stmdb	sp!, {r0, r1, r2, r4, r5, r6, r7, r8, r9, lr}
@@ -26409,8 +26410,8 @@ static void prvCheckForValidListAndQueue( void )
  800a64e:	f7ff fd35 	bl	800a0bc <__hi0bits>
  800a652:	ebc0 1042 	rsb	r0, r0, r2, lsl #5
  800a656:	e7e5      	b.n	800a624 <__d2b+0x74>
- 800a658:	0800b354 	.word	0x0800b354
- 800a65c:	0800b365 	.word	0x0800b365
+ 800a658:	0800b358 	.word	0x0800b358
+ 800a65c:	0800b369 	.word	0x0800b369
 
 0800a660 <__ssputs_r>:
  800a660:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
@@ -26687,11 +26688,11 @@ static void prvCheckForValidListAndQueue( void )
  800a8f4:	4638      	mov	r0, r7
  800a8f6:	f7fe f91f 	bl	8008b38 <_printf_i>
  800a8fa:	e7ed      	b.n	800a8d8 <_svfiprintf_r+0x1c0>
- 800a8fc:	0800b3be 	.word	0x0800b3be
- 800a900:	0800b3c8 	.word	0x0800b3c8
+ 800a8fc:	0800b3c2 	.word	0x0800b3c2
+ 800a900:	0800b3cc 	.word	0x0800b3cc
  800a904:	08008629 	.word	0x08008629
  800a908:	0800a661 	.word	0x0800a661
- 800a90c:	0800b3c4 	.word	0x0800b3c4
+ 800a90c:	0800b3c8 	.word	0x0800b3c8
 
 0800a910 <__sflush_r>:
  800a910:	f9b1 200c 	ldrsh.w	r2, [r1, #12]
@@ -26910,9 +26911,9 @@ static void prvCheckForValidListAndQueue( void )
  800aae4:	e7f3      	b.n	800aace <__assert_func+0x12>
  800aae6:	bf00      	nop
  800aae8:	2000001c 	.word	0x2000001c
- 800aaec:	0800b3d9 	.word	0x0800b3d9
- 800aaf0:	0800b3e6 	.word	0x0800b3e6
- 800aaf4:	0800b414 	.word	0x0800b414
+ 800aaec:	0800b3dd 	.word	0x0800b3dd
+ 800aaf0:	0800b3ea 	.word	0x0800b3ea
+ 800aaf4:	0800b418 	.word	0x0800b418
 
 0800aaf8 <_calloc_r>:
  800aaf8:	b570      	push	{r4, r5, r6, lr}
@@ -27300,11 +27301,11 @@ static void prvCheckForValidListAndQueue( void )
  800ae64:	4630      	mov	r0, r6
  800ae66:	f7fd fe67 	bl	8008b38 <_printf_i>
  800ae6a:	e7e4      	b.n	800ae36 <_vfiprintf_r+0x1e6>
- 800ae6c:	0800b3be 	.word	0x0800b3be
- 800ae70:	0800b3c8 	.word	0x0800b3c8
+ 800ae6c:	0800b3c2 	.word	0x0800b3c2
+ 800ae70:	0800b3cc 	.word	0x0800b3cc
  800ae74:	08008629 	.word	0x08008629
  800ae78:	0800ac2d 	.word	0x0800ac2d
- 800ae7c:	0800b3c4 	.word	0x0800b3c4
+ 800ae7c:	0800b3c8 	.word	0x0800b3c8
 
 0800ae80 <__swbuf_r>:
  800ae80:	b5f8      	push	{r3, r4, r5, r6, r7, lr}

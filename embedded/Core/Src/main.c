@@ -602,7 +602,7 @@ void printMeasurements() {
 	comprint(buff, sprintf(buff, "\033[H"));
 	for (int i = 0; i < SENSOR_LINES; ++i) {
 		int value = adcAvg[i];
-		comprint(buff, sprintf(buff, "Line %d: \033[1m%d\033[m/%d\r\n", i + 1, value, ADC_MAX_VALUE));
+		comprint(buff, sprintf(buff, "Line %d: \033[1m%4.d\033[m/%d\r\n", i + 1, value, ADC_MAX_VALUE));
 		int line_fill = (int) (value / (float) ADC_MAX_VALUE * BAR_LENGTH);
 		comprint(buff, sprintf(buff, "[%.*s%.*s]\r\n", line_fill, FILL_SIGN, (BAR_LENGTH - line_fill), EMPTY_SIGN));
 	}
