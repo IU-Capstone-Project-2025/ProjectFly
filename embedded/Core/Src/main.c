@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include <math.h>
 
 /* USER CODE END Includes */
 
@@ -33,8 +34,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-// max value ADC can output
+// max value ADC can output and its voltage
 #define ADC_MAX_VALUE 4095
+#define ADC_MAX_VOLTAGE 3.3
 // number of measurements to store for averaging
 #define ADC_WINDOW_SIZE 1024
 // number of sensor lines
@@ -71,6 +73,18 @@ const osThreadAttr_t AdcTask_attributes = {
   .priority = (osPriority_t) osPriorityBelowNormal,
 };
 /* USER CODE BEGIN PV */
+
+/* Configs */
+/// Rescale each line to this boundaries
+const int lineLength[SENSOR_LINES] = { 6, 6 };
+const double threshold = 150.;
+const double sens_boundaries[SENSOR_LINES][2] = {
+    {0., 90.},
+	{10., 100.}
+};
+const double sens_max = 100.;
+
+char buff[512];
 uint32_t adcData[SENSOR_LINES];
 uint32_t adcBuffer[SENSOR_LINES][ADC_WINDOW_SIZE] = {0};
 uint64_t adcSum[SENSOR_LINES] = {0};
@@ -574,16 +588,36 @@ void setPWM(uint16_t value, TIM_HandleTypeDef *timer, uint16_t channel)
  * @param[in] ADC which invoked the conversion
  */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
-	// index to value in window to overwrite old values with new ones
-	static uint16_t adc1_window_i = 0;
 	if (hadc->Instance == ADC1) {
+		// index to value in window to overwrite old values with new ones
+		static uint16_t window_i = 0;
 		for (int i = 0; i < SENSOR_LINES; ++i) {
-			adcSum[i] -= adcBuffer[i][adc1_window_i];
+			adcSum[i] -= adcBuffer[i][window_i];
 			adcSum[i] += adcData[i];
-			adcBuffer[i][adc1_window_i] = adcData[i];
+			adcBuffer[i][window_i] = adcData[i];
 		}
-		adc1_window_i = ++adc1_window_i % ADC_WINDOW_SIZE;
+		window_i = (window_i + 1) % ADC_WINDOW_SIZE;
 	}
+}
+
+double adcToVolts(uint32_t adc) {
+	return adc / (double) ADC_MAX_VALUE * ADC_MAX_VOLTAGE;
+}
+
+int voltToLineNumber(double v, int N) {
+	const long double V_S = ADC_MAX_VOLTAGE;
+	const long double R = 9180.L;
+	const long double R_G = 99500.L;
+
+	long double a = - v / V_S * R * R;
+	long double b = R * R_G + v / V_S * (R*R * N + R*R);
+	long double c = - R * R_G * N - R * R_G + v / V_S * (R * R_G * N + R * R_G);
+
+	long double D = b * b - 4 * a * c;
+
+	long double x1 = (sqrtl(D) - b) / a / 2.L;
+	int n = (x1 == x1) ? ((int) roundl(x1)) : 7;
+	return n;
 }
 
 /**
@@ -593,14 +627,39 @@ void printMeasurements() {
 	static const int BAR_LENGTH = 40;
 	static const char FILL_SIGN[] = "##################################################################";
 	static const char EMPTY_SIGN[] = "------------------------------------------------------------------";
-	char buff[512];
+
+	double volts[SENSOR_LINES];
+	int activeN[SENSOR_LINES];
+	double voltavg = 0.;
+	int activeC = 0;
 	comprint(buff, sprintf(buff, "\033[H"));
 	for (int i = 0; i < SENSOR_LINES; ++i) {
-		int value = adcSum[i] / ADC_WINDOW_SIZE;
-		comprint(buff, sprintf(buff, "Line %d: \033[1m%4.d\033[m/%d\r\n", i + 1, value, ADC_MAX_VALUE));
-		int line_fill = (int) (value / (float) ADC_MAX_VALUE * BAR_LENGTH);
-		comprint(buff, sprintf(buff, "[%.*s%.*s]\r\n", line_fill, FILL_SIGN, (BAR_LENGTH - line_fill), EMPTY_SIGN));
+		// volts[i] = adcToVolts(adcSum[i] / (double) ADC_WINDOW_SIZE);
+		volts[i] = adcToVolts(adcData[i]);
+		activeN[i] = voltToLineNumber(volts[i], lineLength[i]);
+		/*
+		if (activeN[i] < lineLength[i] + 1) {
+			int dbound = sens_boundaries[i][1] - sens_boundaries[i][0];
+			volts[i] = volts[i] * dbound / ADC_MAX_VALUE + sens_boundaries[i][0];
+		}
+		*/
+		voltavg += volts[i];
+		if (activeN[i] < lineLength[i] + 1) {
+			++activeC;
+		}
+		comprint(buff, sprintf(
+				buff,
+				"Line %d: \033[1m%.d\033[m (\033[1m%1.1f\033[m/%1.1f)\033[K\r\n",
+				i + 1,
+				activeN[i],
+				volts[i],
+				ADC_MAX_VOLTAGE
+		));
 	}
+	voltavg = voltavg / activeC;
+	//int line_fill = (int) (voltavg * BAR_LENGTH / (double) sens_max);
+	//comprint(buff, sprintf(buff, "valn: %d\r\n", activeC));
+	//comprint(buff, sprintf(buff, "[%.*s%.*s]\r\n", line_fill, FILL_SIGN, (BAR_LENGTH - line_fill), EMPTY_SIGN));
 }
 
 /* USER CODE END 4 */

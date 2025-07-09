@@ -556,7 +556,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 		for (int j = 0; j < 2; ++j) {
 			adcBuffer[j][i] = adcData[j];
 		}
-		i = ++i % ADC_BUFFER_SIZE;
+		i = (i + 1) % ADC_BUFFER_SIZE;
 	}
 }
 

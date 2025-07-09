@@ -37,15 +37,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  16 .debug_macro  000047fe  00000000  00000000  0002d306  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0001b29b  00000000  00000000  00031b04  2**0
+ 17 .debug_line   0001b295  00000000  00000000  00031b04  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0010aa02  00000000  00000000  0004cd9f  2**0
+ 18 .debug_str    0010aa02  00000000  00000000  0004cd99  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  001577a1  2**0
+ 19 .comment      00000043  00000000  00000000  0015779b  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00006b70  00000000  00000000  001577e4  2**2
+ 20 .debug_frame  00006b70  00000000  00000000  001577e0  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 0000005c  00000000  00000000  0015e354  2**0
+ 21 .debug_line_str 0000005c  00000000  00000000  0015e350  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1802,16 +1802,15 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
  8000f26:	2b01      	cmp	r3, #1
  8000f28:	ddec      	ble.n	8000f04 <HAL_ADC_ConvCpltCallback+0x18>
 		}
-		i = ++i % ADC_BUFFER_SIZE;
+		i = (i + 1) % ADC_BUFFER_SIZE;
  8000f2a:	4b0a      	ldr	r3, [pc, #40]	@ (8000f54 <HAL_ADC_ConvCpltCallback+0x68>)
  8000f2c:	881b      	ldrh	r3, [r3, #0]
  8000f2e:	3301      	adds	r3, #1
- 8000f30:	b29a      	uxth	r2, r3
- 8000f32:	4b08      	ldr	r3, [pc, #32]	@ (8000f54 <HAL_ADC_ConvCpltCallback+0x68>)
- 8000f34:	801a      	strh	r2, [r3, #0]
- 8000f36:	4b07      	ldr	r3, [pc, #28]	@ (8000f54 <HAL_ADC_ConvCpltCallback+0x68>)
- 8000f38:	881b      	ldrh	r3, [r3, #0]
- 8000f3a:	f003 033f 	and.w	r3, r3, #63	@ 0x3f
+ 8000f30:	425a      	negs	r2, r3
+ 8000f32:	f003 033f 	and.w	r3, r3, #63	@ 0x3f
+ 8000f36:	f002 023f 	and.w	r2, r2, #63	@ 0x3f
+ 8000f3a:	bf58      	it	pl
+ 8000f3c:	4253      	negpl	r3, r2
  8000f3e:	b29a      	uxth	r2, r3
  8000f40:	4b04      	ldr	r3, [pc, #16]	@ (8000f54 <HAL_ADC_ConvCpltCallback+0x68>)
  8000f42:	801a      	strh	r2, [r3, #0]
