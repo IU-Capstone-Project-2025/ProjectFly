@@ -77,12 +77,11 @@ const osThreadAttr_t AdcTask_attributes = {
 /* Configs */
 /// Rescale each line to this boundaries
 const int lineLength[SENSOR_LINES] = { 6, 6 };
-const double threshold = 150.;
-const double sens_boundaries[SENSOR_LINES][2] = {
+const float sens_boundaries[SENSOR_LINES][2] = {
     {0., 90.},
 	{10., 100.}
 };
-const double sens_max = 100.;
+const float sens_max = 100.;
 
 char buff[512];
 uint32_t adcData[SENSOR_LINES];
@@ -616,7 +615,7 @@ int voltToLineNumber(double v, int N) {
 	long double D = b * b - 4 * a * c;
 
 	long double x1 = (sqrtl(D) - b) / a / 2.L;
-	int n = (x1 == x1) ? ((int) roundl(x1)) : 7;
+	int n = N + 1 - ((x1 == x1) ? ((int) roundl(x1)) : 7);
 	return n;
 }
 
@@ -630,36 +629,28 @@ void printMeasurements() {
 
 	double volts[SENSOR_LINES];
 	int activeN[SENSOR_LINES];
-	double voltavg = 0.;
-	int activeC = 0;
+	int scaledC = 0;
+	double scaled;
 	comprint(buff, sprintf(buff, "\033[H"));
 	for (int i = 0; i < SENSOR_LINES; ++i) {
-		// volts[i] = adcToVolts(adcSum[i] / (double) ADC_WINDOW_SIZE);
-		volts[i] = adcToVolts(adcData[i]);
+		volts[i] = adcToVolts(adcSum[i] / (double) ADC_WINDOW_SIZE);
 		activeN[i] = voltToLineNumber(volts[i], lineLength[i]);
-		/*
-		if (activeN[i] < lineLength[i] + 1) {
-			int dbound = sens_boundaries[i][1] - sens_boundaries[i][0];
-			volts[i] = volts[i] * dbound / ADC_MAX_VALUE + sens_boundaries[i][0];
-		}
-		*/
-		voltavg += volts[i];
-		if (activeN[i] < lineLength[i] + 1) {
-			++activeC;
+		if (activeN[i] > 0) {
+			++scaledC;
+			float dbound = sens_boundaries[i][1] - sens_boundaries[i][0];
+			scaled += activeN[i] * dbound / (float) lineLength[i] + sens_boundaries[i][0];
 		}
 		comprint(buff, sprintf(
 				buff,
-				"Line %d: \033[1m%.d\033[m (\033[1m%1.1f\033[m/%1.1f)\033[K\r\n",
+				"Line %d: \033[1m%1d\033[m (\033[1m%1.1f\033[m/%1.1f)\033[K\r\n",
 				i + 1,
 				activeN[i],
 				volts[i],
 				ADC_MAX_VOLTAGE
 		));
 	}
-	voltavg = voltavg / activeC;
-	//int line_fill = (int) (voltavg * BAR_LENGTH / (double) sens_max);
-	//comprint(buff, sprintf(buff, "valn: %d\r\n", activeC));
-	//comprint(buff, sprintf(buff, "[%.*s%.*s]\r\n", line_fill, FILL_SIGN, (BAR_LENGTH - line_fill), EMPTY_SIGN));
+	int line_fill = scaledC == 0 ? 0 : (int) (scaled * BAR_LENGTH / (float) scaledC / sens_max);
+	comprint(buff, sprintf(buff, "[%.*s%.*s]\r\n", line_fill, FILL_SIGN, (BAR_LENGTH - line_fill), EMPTY_SIGN));
 }
 
 /* USER CODE END 4 */
