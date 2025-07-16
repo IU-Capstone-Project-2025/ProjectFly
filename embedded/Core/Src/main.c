@@ -624,8 +624,8 @@ double adcToVolts(uint32_t adc) {
  */
 int voltToLineNumber(double v, int N) {
 	const long double V_S = ADC_MAX_VOLTAGE;
-	const long double R = 9180.L;
-	const long double R_G = 99500.L;
+	const long double R = 7440.L;
+	const long double R_G = 98600.L;
 
 	long double a = - v / V_S * R * R;
 	long double b = R * R_G + v / V_S * (R*R * N + R*R);
