@@ -34,12 +34,12 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-// max value ADC can output and its voltage
+/// Max value ADC can output and its voltage
 #define ADC_MAX_VALUE 4095
 #define ADC_MAX_VOLTAGE 3.3
-// number of measurements to store for averaging
+/// Number of measurements to store for averaging
 #define ADC_WINDOW_SIZE 1024
-// number of sensor lines
+/// Number of sensor lines
 #define SENSOR_LINES 2
 
 /* USER CODE END PD */
@@ -75,17 +75,23 @@ const osThreadAttr_t AdcTask_attributes = {
 /* USER CODE BEGIN PV */
 
 /* Configs */
-/// Rescale each line to this boundaries
+/// Number of sensors in each line
 const int lineLength[SENSOR_LINES] = { 6, 6 };
+/// Rescale each line to this boundaries
 const float sens_boundaries[SENSOR_LINES][2] = {
-    {0., 90.},
-	{10., 100.}
+    {0., 900.},
+	{100., 1000.}
 };
-const float sens_max = 100.;
+/// Max boundary value
+const float sens_max = 1000.;
 
+/// Buffer for printing
 char buff[512];
+/// ADC measurements go here
 uint32_t adcData[SENSOR_LINES];
+/// Window of last n measurements
 uint32_t adcBuffer[SENSOR_LINES][ADC_WINDOW_SIZE] = {0};
+/// Sum of last n measurements
 uint64_t adcSum[SENSOR_LINES] = {0};
 
 /* USER CODE END PV */
@@ -555,8 +561,8 @@ void defaultTask() {
 /**
  * Print message to the default (ST-Link) serial port.
  *
- * @param[in] msg Message to be printed
- * @param[in] len Length of the message
+ * @param msg: Message to be printed
+ * @param len: Length of the message
  */
 void comprint(char *msg, int len) {
 	HAL_USART_Transmit(&husart3, (uint8_t *)msg, len, 100);
@@ -565,9 +571,9 @@ void comprint(char *msg, int len) {
 /**
  * Set pulse time of a timer's channel.
  *
- * @param[in] value Pulse ticks
- * @param[in] timer Timer
- * @param[in] channel Channel
+ * @param value: Pulse ticks
+ * @param timer: Timer
+ * @param channel: Channel
  */
 void setPWM(uint16_t value, TIM_HandleTypeDef *timer, uint16_t channel)
 {
@@ -584,7 +590,7 @@ void setPWM(uint16_t value, TIM_HandleTypeDef *timer, uint16_t channel)
 /**
  * Callback on ADC conversion.
  *
- * @param[in] ADC which invoked the conversion
+ * @param hadc: ADC which invoked the conversion
  */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 	if (hadc->Instance == ADC1) {
@@ -599,10 +605,23 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 	}
 }
 
+/**
+ * Convert a raw ADC measurement to real voltage.
+ *
+ * @param adc: Raw ADC measurement
+ * @return Voltage
+ */
 double adcToVolts(uint32_t adc) {
 	return adc / (double) ADC_MAX_VALUE * ADC_MAX_VOLTAGE;
 }
 
+/**
+ * Convert voltage to index number of a triggered reed sensor.
+ *
+ * @param v: Voltage
+ * @param N: Total number of sensors in the line
+ * @return Index number of a triggered reed sensor in range [1, N]
+ */
 int voltToLineNumber(double v, int N) {
 	const long double V_S = ADC_MAX_VOLTAGE;
 	const long double R = 9180.L;
@@ -620,7 +639,7 @@ int voltToLineNumber(double v, int N) {
 }
 
 /**
- * Pretty-print a current measurement state of water level.
+ * Pretty-print current measurement state of water level into the serial port.
  */
 void printMeasurements() {
 	static const int BAR_LENGTH = 40;
@@ -631,7 +650,7 @@ void printMeasurements() {
 	int activeN[SENSOR_LINES];
 	int scaledC = 0;
 	double scaled;
-	comprint(buff, sprintf(buff, "\033[H"));
+	comprint(buff, sprintf(buff, "\033[J\033[H"));
 	for (int i = 0; i < SENSOR_LINES; ++i) {
 		volts[i] = adcToVolts(adcSum[i] / (double) ADC_WINDOW_SIZE);
 		activeN[i] = voltToLineNumber(volts[i], lineLength[i]);
@@ -649,7 +668,7 @@ void printMeasurements() {
 				ADC_MAX_VOLTAGE
 		));
 	}
-	int line_fill = scaledC == 0 ? 0 : (int) (scaled * BAR_LENGTH / (float) scaledC / sens_max);
+	int line_fill = (scaledC == 0) ? 0 : ((int) (scaled * BAR_LENGTH / (float) scaledC / sens_max));
 	comprint(buff, sprintf(buff, "[%.*s%.*s]\r\n", line_fill, FILL_SIGN, (BAR_LENGTH - line_fill), EMPTY_SIGN));
 }
 
