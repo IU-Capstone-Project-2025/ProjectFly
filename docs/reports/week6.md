@@ -117,12 +117,6 @@ https://docs.google.com/presentation/d/1ErlLMnh_HFSRYw7ifzSZqWEL7AQgV6kYaB8lmL1x
 
 ## Individual contribution of each participant
 
-я - сбор плат, тестирование
-Арсений - сбор плат, тестирование
-Дима Р - код для расчёта АДЦ, код для визуализации и интерппритации сигнала с герконов
-Анас - обновлённая версия моделей
-
-
 | Member					| Contribution					|
 |---------------------------|-------------------------------|
 | Dmitriy Vizitei			| Board assembly, testing |
