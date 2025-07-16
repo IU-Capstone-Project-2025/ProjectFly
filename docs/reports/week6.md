@@ -20,9 +20,9 @@ title: "Week #6"
 
 *Specify here all the necessary links to your website, application installer, final demo, etc.*
 
-- **Deployment**: [Setup instructions](#Setup%20instructions)
-- **API Docs**: [API Docs](#API%20Docs)
-- **Documentation**: [Documentations](#Documentations)
+- **Deployment**: [Setup instructions](#Setup-instructions)
+- **API Docs**: [API Docs](#API-Docs)
+- **Documentation**: [Documentation](#Documentation)
 - **Demo**: https://drive.google.com/file/d/1RMR0l2JPTSWMmnUTkXt8X2qB1T35l_1s/view?usp=drive_link
 
 ## Final deliverables
