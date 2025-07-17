@@ -38,7 +38,7 @@
 #define ADC_MAX_VALUE 4095
 #define ADC_MAX_VOLTAGE 3.3
 /// Number of measurements to store for averaging
-#define ADC_WINDOW_SIZE 1024
+#define ADC_WINDOW_SIZE 128
 /// Number of sensor lines
 #define SENSOR_LINES 2
 
@@ -639,6 +639,31 @@ int voltToLineNumber(double v, int N) {
 }
 
 /**
+ * Calculates measurements of each sensor line.
+ * If no line is triggered now, the last measurement is used.
+ *
+ * @param[out] measurements: Measurements of each line
+ * @param[out] voltages: Voltages on each line
+ * @return Whether the sensor is triggered
+ */
+short getLineMeasurements(int *measurements, double *voltages) {
+	static int prev[SENSOR_LINES] = { 0 };
+
+	int active[SENSOR_LINES];
+	short trig = 0;
+	for (int i = 0; i < SENSOR_LINES; ++i) {
+		voltages[i] = adcToVolts(adcSum[i] / (double) ADC_WINDOW_SIZE);
+		active[i] = voltToLineNumber(voltages[i], lineLength[i]);
+		if (active[i]) trig = 1;
+	}
+	for (int i = 0; i < SENSOR_LINES; ++i) {
+		measurements[i] = trig ? active[i] : prev[i];
+		if (trig) prev[i] = active[i];
+	}
+	return trig;
+}
+
+/**
  * Pretty-print current measurement state of water level into the serial port.
  */
 void printMeasurements() {
@@ -648,13 +673,12 @@ void printMeasurements() {
 
 	double volts[SENSOR_LINES];
 	int activeN[SENSOR_LINES];
+	getLineMeasurements(activeN, volts);
 	int scaledC = 0;
 	double scaled;
 	comprint(buff, sprintf(buff, "\033[J\033[H"));
 	for (int i = 0; i < SENSOR_LINES; ++i) {
-		volts[i] = adcToVolts(adcSum[i] / (double) ADC_WINDOW_SIZE);
-		activeN[i] = voltToLineNumber(volts[i], lineLength[i]);
-		if (activeN[i] > 0) {
+		if (activeN[i]) {
 			++scaledC;
 			float dbound = sens_boundaries[i][1] - sens_boundaries[i][0];
 			scaled += activeN[i] * dbound / (float) lineLength[i] + sens_boundaries[i][0];
@@ -668,7 +692,9 @@ void printMeasurements() {
 				ADC_MAX_VOLTAGE
 		));
 	}
-	int line_fill = (scaledC == 0) ? 0 : ((int) (scaled * BAR_LENGTH / (float) scaledC / sens_max));
+	scaled = (scaledC == 0) ? 0 : (scaled / scaledC);
+	comprint(buff, sprintf(buff, "Water level: %4.f/%.f\r\n", scaled, sens_max));
+	int line_fill = (scaledC == 0) ? 0 : ((int) (scaled * BAR_LENGTH / sens_max));
 	comprint(buff, sprintf(buff, "[%.*s%.*s]\r\n", line_fill, FILL_SIGN, (BAR_LENGTH - line_fill), EMPTY_SIGN));
 }
 
@@ -704,7 +730,7 @@ void AdcRead(void *argument)
   for(;;)
   {
 	HAL_ADC_Start_DMA(&hadc1, adcData, SENSOR_LINES);
-	osDelay(1);
+	// osDelay(1);
   }
   /* USER CODE END AdcRead */
 }
