@@ -6,6 +6,7 @@
 "./Core/Src/syscalls.o"
 "./Core/Src/sysmem.o"
 "./Core/Src/system_stm32f7xx.o"
+"./Core/Src/user.o"
 "./Core/Startup/startup_stm32f767zitx.o"
 "./Drivers/STM32F7xx_HAL_Driver/stm32f7xx_hal.o"
 "./Drivers/STM32F7xx_HAL_Driver/stm32f7xx_hal_adc.o"
