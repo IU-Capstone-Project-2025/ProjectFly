@@ -51,3 +51,9 @@ ProjectFly
 - **Dmitry Ryabov** - programming, testing
 ### Documentation 
 - **Andrew Pavlov** - documentation, reports
+
+## 🛠 **Build && Install Guide**  
+**Docker** ([Install Guide](https://docs.docker.com/engine/install/)) <br>
+In terminal:  
+1) `docker-compose build` 
+2) `docker-compose up` 
