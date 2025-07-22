@@ -1,0 +1,5 @@
+# Electrical Circuit
+The electrical circuit of the device consists of six normally closed (NC) reed switches (4x28 mm) that connect power and signal lines. A 10 kΩ resistor is placed between each reed switch to detect which one is closed using the voltage divider rule. A current-limiting resistor is placed before the first reed switch to prevent a short circuit. A separating resistor is placed after the last reed switch to distinguish between the last reed switch being closed and no switch being closed. A 100 kΩ resistor is connected between the signal line and ground to suppress contact bouncing. The circuit operates at 3.3 V.
+
+# PCB Design
+The printed circuit board (PCB) has a length matching the tank length (234 mm), which fits six reed switches with 0.85 mm spacing between leads, and a minimum possible width of 11 mm. The trace width is 1 mm for reliability and ease of manufacturing. The final device consists of two identical PCBs, but with the reed switches offset by 14 mm (half the length of a reed switch) relative to each other. This allows dual verification of magnet position and eliminates blind spots between reed switches on the opposite PCB.
