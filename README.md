@@ -1,43 +1,59 @@
-# **Project Fly**  
+# **Project Fly** 
 
-🚀 *This project is a request for the development of a solution for agricultural drone use. 
-The task is involve development of the a system for measuring the liquid level in a UAV tank for spraying agricultural crops.*  
+Reed Switch-Based Liquid Level Sesnor.
 
----
+![Sensor with assembly tool inside of a tank](demos/sensor_tool.jpg)
 
-## 📌 **Overview**  
-**Project Fly** delivers a solution for monitoring liquid levels in drone tanks. Designed to solve a critical industry pain point—premature fluid transfer interruption despite residual liquid—this system prevents operational inefficiencies and time waste during dron worka.
+## 📌 Overview
+A compact reed switch-based liquid level sensor designed for UAV-mounted tanks for agrochemicals. The sensor uses a magnetic float and hermetically sealed reed switches to reliably detect liquid levels in harsh environments.
 
----
+![Drone with tank](demos/drone.jpg)
+
+## 🔧 Key Features 
+- **No calibration needed**: float does not depend on liquid type
+- **Robust signal**: sliding window median filter
+- **Easy to install**: special assembling tool
+- **Low power consumption**
+
+## 🛠️ Hardware 
+- **Key components**: Reed Switches 4x28 mm NC
+- **Microcontroller**: STM32F103C8T6
+- **Output**: Digital signal (UART)
+- **Power**: 3.3V-5V
+
+![PCB](demos/pcb.png)
+
+## 📚 Documentation
+- [**Schematics sheet**](docs/schematics.pdf)
+- [**Schematics description**](docs/schematics.md)
+- [**Assembly guide**](docs/assembly.md)
+
+## 📂 Project Structure
+```
+ProjectFly
+├── cad         # 3D models
+├── demos       # Demonstrations videos and images
+├── docs        # Project documentation
+├── firmware    # Embedded code
+│   ├── arduino # Arduino-compatible firmware (for prototyping)
+│   └── stm32   # STM32-optimized firmware (production version)
+├── hardware    # Electronics design files
+│   └── pcb     # PCB schematics and layouts
+└── tests       # Validation scripts
+```
+
+## 👥 Team Members
+### Hardware
+- **Dmitriy Vizitei** - team leader, prototyping
+- **Senya Belykh** - schematics, PCB design
+- **Anas Hamrouni** - CAD modeling & design
+### Software
+- **Dmitry Ryabov** - programming, testing
+### Documentation 
+- **Andrew Pavlov** - documentation, reports
 
 ## 🛠 **Build && Install Guide**  
 **Docker** ([Install Guide](https://docs.docker.com/engine/install/)) <br>
 In terminal:  
 1) `docker-compose build` 
 2) `docker-compose up` 
-
----
-
-## 📂 **Project Structure**  
-```
-├── docker-compose.yaml      # Docker Compose configuration for multi-container setup
-├── Dockerfile               # Docker image build instructions
-├── index.html               # Html page
-├── docs/                    # Project documentation
-│   └── reports/             # Reports about project work
-├── index.html               # Index file
-└── README.md                # Project overview and documentation
-
-```
-
----
-
-### **Team Members**
-
-| Team Member							   | Telegram Alias	| Email Address   					   |
-|-----------------------------------|-----------------|-----------------------------------|
-| Dmitriy Vizitei (Lead)				| @otkisaev			| d.vizitei@innopolis.university 	|
-| Senea Belykh							   | @SenyaZenya		| s.belykh@innopolis.university	|
-| Dmitry Ryabov							| @theDioxider		| d.ryabov@innopolis.university |
-| Anas Hamrouni							| @reachnasta		| a.hamrouni@innopolis.university |
-| Andrew Pavlov							| @chaleshka_0		| and.pavlov@innopolis.university |  
