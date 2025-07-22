@@ -1,6 +1,6 @@
 # **Project Fly** 
 
-Reed Switch-Based Liquid Level Sesnor.
+🚀 *Reed Switch-Based Liquid Level Sesnor.*
 
 ![Sensor with assembly tool inside of a tank](demos/sensor_tool.jpg)
 
