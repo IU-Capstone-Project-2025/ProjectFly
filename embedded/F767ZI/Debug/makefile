@@ -9,6 +9,7 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
+-include Usr/Src/subdir.mk
 -include Middlewares/FreeRTOS/subdir.mk
 -include Drivers/STM32F7xx_HAL_Driver/subdir.mk
 -include Core/Startup/subdir.mk
@@ -85,8 +86,8 @@ all: main-build
 main-build: project_fly.elf secondary-outputs
 
 # Tool invocations
-project_fly.elf project_fly.map: $(OBJS) $(USER_OBJS) C:\Users\Dioxider\Documents\project-fly\embedded\STM32F767ZI\STM32F767ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "project_fly.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\Dioxider\Documents\project-fly\embedded\STM32F767ZI\STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="project_fly.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+project_fly.elf project_fly.map: $(OBJS) $(USER_OBJS) C:\Users\Dioxider\Documents\project-fly\embedded\F767ZI\STM32F767ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "project_fly.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\Dioxider\Documents\project-fly\embedded\F767ZI\STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="project_fly.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
