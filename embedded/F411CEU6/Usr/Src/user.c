@@ -28,6 +28,7 @@ const float sens_boundaries[SENSOR_LINES][2] = {
 /// Max boundary value
 const float sens_max = 1000.;
 
+double volts[SENSOR_LINES];
 /// Buffer for printing
 char buf[512];
 /// ADC measurements go here
@@ -47,7 +48,7 @@ void defaultBody() {
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, 0);
 	for (;;) {
 		printMeasurements();
-		HAL_Delay(150);
+		HAL_Delay(100);
 	}
 }
 
@@ -92,9 +93,11 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 		// index to value in window to overwrite old values with new ones
 		static uint16_t window_i = 0;
 		for (int i = 0; i < SENSOR_LINES; ++i) {
+			if (1) {
 			adcSum[i] -= adcBuffer[i][window_i];
 			adcSum[i] += adcData[i];
 			adcBuffer[i][window_i] = adcData[i];
+			}
 		}
 		window_i = (window_i + 1) % ADC_WINDOW_SIZE;
 	}
@@ -166,7 +169,6 @@ void printMeasurements() {
 	static const char FILL_SIGN[] = "##################################################################";
 	static const char EMPTY_SIGN[] = "------------------------------------------------------------------";
 
-	double volts[SENSOR_LINES];
 	int activeN[SENSOR_LINES];
 	getLineMeasurements(activeN, volts);
 	int scaledC = 0;
@@ -188,7 +190,8 @@ void printMeasurements() {
 		));
 	}
 	scaled = (scaledC == 0) ? 0 : (scaled / scaledC);
-	comprint(buf, sprintf(buf, "Water level: %4.f/%.f\e[K\r\n", scaled, sens_max));
+	comprint(buf, sprintf(buf, "Water level: \e[1m%4.f\e[m/%.f\e[K\r\n", scaled, sens_max));
 	int line_fill = (scaledC == 0) ? 0 : ((int) (scaled * BAR_LENGTH / sens_max));
-	comprint(buf, sprintf(buf, "[%.*s%.*s]\e[K\r\n", line_fill, FILL_SIGN, (BAR_LENGTH - line_fill), EMPTY_SIGN));
+	line_fill = line_fill < BAR_LENGTH ? line_fill : BAR_LENGTH;
+	comprint(buf, sprintf(buf, "\e[1m[%.*s\e[m%.*s\e[1m]\e[m\e[K\r\n", line_fill, FILL_SIGN, (BAR_LENGTH - line_fill), EMPTY_SIGN));
 }
